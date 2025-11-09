@@ -7,10 +7,37 @@ Maze.__index = Maze
 
 local ipairs = ipairs
 local lg, random = love.graphics, love.math.random
-local floor, insert, remove = math.floor, table.insert, table.remove
+local insert, remove = table.insert, table.remove
 
 -- right, left, down, up
 local DIRECTIONS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+
+local function placeCollectibles(self)
+    self.dots = {}
+    self.powerPellets = {}
+
+    for x = 2, self.width - 1 do
+        for y = 2, self.height - 1 do
+            if self.cells[x][y] == 0 then
+                -- Don't place dots in starting area
+                if not (x >= 8 and x <= 12 and y >= 8 and y <= 12) then
+                    insert(self.dots, { x = x, y = y, collected = false })
+                end
+            end
+        end
+    end
+
+    -- Place power pellets in corners
+    local corners = {
+        { 3, 3 }, { self.width - 2, 3 },
+        { 3, self.height - 2 }, { self.width - 2, self.height - 2 }
+    }
+    for _, corner in ipairs(corners) do
+        if self.cells[corner[1]][corner[2]] == 0 then
+            insert(self.powerPellets, { x = corner[1], y = corner[2], collected = false })
+        end
+    end
+end
 
 function Maze.new(width, height)
     local instance = setmetatable({}, Maze)
@@ -76,34 +103,7 @@ function Maze:generate()
     end
 
     -- Place dots and power pellets
-    self:placeCollectibles()
-end
-
-function Maze:placeCollectibles()
-    self.dots = {}
-    self.powerPellets = {}
-
-    for x = 2, self.width - 1 do
-        for y = 2, self.height - 1 do
-            if self.cells[x][y] == 0 then
-                -- Don't place dots in starting area
-                if not (x >= 8 and x <= 12 and y >= 8 and y <= 12) then
-                    insert(self.dots, { x = x, y = y, collected = false })
-                end
-            end
-        end
-    end
-
-    -- Place power pellets in corners
-    local corners = {
-        { 3, 3 }, { self.width - 2, 3 },
-        { 3, self.height - 2 }, { self.width - 2, self.height - 2 }
-    }
-    for _, corner in ipairs(corners) do
-        if self.cells[corner[1]][corner[2]] == 0 then
-            insert(self.powerPellets, { x = corner[1], y = corner[2], collected = false })
-        end
-    end
+    placeCollectibles(self)
 end
 
 function Maze:getCell(x, y)
@@ -113,36 +113,7 @@ function Maze:getCell(x, y)
     return self.cells[x][y]
 end
 
-function Maze:collectDot(x, y)
-    for _, dot in ipairs(self.dots) do
-        if floor(dot.x) == floor(x) and floor(dot.y) == floor(y) and not dot.collected then
-            dot.collected = true
-            return true
-        end
-    end
-    return false
-end
-
-function Maze:collectPowerPellet(x, y)
-    for i, pellet in ipairs(self.powerPellets) do
-        if floor(pellet.x) == floor(x) and floor(pellet.y) == floor(y) and not pellet.collected then
-            pellet.collected = true
-            return true
-        end
-    end
-    return false
-end
-
-function Maze:getRemainingDots()
-    local count = 0
-    for _, dot in ipairs(self.dots) do
-        if not dot.collected then count = count + 1 end
-    end
-    return count
-end
-
 function Maze:draw(cellSize, offsetX, offsetY)
-
     -- Draw walls
     lg.setColor(0.2, 0.3, 0.8)
     for x = 1, self.width do
@@ -157,8 +128,11 @@ function Maze:draw(cellSize, offsetX, offsetY)
     lg.setColor(1, 1, 0.8)
     for _, dot in ipairs(self.dots) do
         if not dot.collected then
-            lg.circle("fill", offsetX + dot.x * cellSize - cellSize / 2, offsetY + dot.y * cellSize - cellSize / 2,
-                cellSize / 8)
+            lg.circle("fill",
+                offsetX + dot.x * cellSize - cellSize / 2,
+                offsetY + dot.y * cellSize - cellSize / 2,
+                cellSize / 8
+            )
         end
     end
 
@@ -166,8 +140,11 @@ function Maze:draw(cellSize, offsetX, offsetY)
     lg.setColor(1, 0.5, 0.8)
     for _, pellet in ipairs(self.powerPellets) do
         if not pellet.collected then
-            lg.circle("fill", offsetX + pellet.x * cellSize - cellSize / 2, offsetY + pellet.y * cellSize - cellSize / 2,
-                cellSize / 4)
+            lg.circle("fill",
+                offsetX + pellet.x * cellSize - cellSize / 2,
+                offsetY + pellet.y * cellSize - cellSize / 2,
+                cellSize / 4
+            )
         end
     end
 end
