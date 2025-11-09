@@ -1,4 +1,4 @@
--- Chompster - Pac-Man inspired game
+-- Chompster
 -- License: MIT
 -- Copyright (c) 2025 Jericho Crosby (Chalwk)
 
