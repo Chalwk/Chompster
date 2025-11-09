@@ -144,9 +144,8 @@ function love.keypressed(key)
     elseif key == "f11" then
         local fullscreen = love.window.getFullscreen()
         love.window.setFullscreen(not fullscreen)
-    elseif gameState == "playing" and not game:isGameOver() then
-        -- Handle player movement
-        game:handleKeyPress(key)
+    elseif gameState == "playing" and not game:isGameOver() and not game:isPaused() then
+        game:keypressed(key)
     end
 end
 

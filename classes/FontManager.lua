@@ -1,4 +1,4 @@
--- Chompster
+-- Love2D_Template
 -- License: MIT
 -- Copyright (c) 2025 Jericho Crosby (Chalwk)
 

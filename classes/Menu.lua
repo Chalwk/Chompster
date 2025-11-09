@@ -1,4 +1,4 @@
--- Chompster
+-- Love2D_Template
 -- License: MIT
 -- Copyright (c) 2025 Jericho Crosby (Chalwk)
 
@@ -297,8 +297,8 @@ function Menu.new(fontManager)
 
     instance.difficulty = "medium"
     instance.title = {
-        text = "GAME_NAME_HERE",
-        subtitle = "REPLACE_THIS_TEXT",
+        text = "CHOMPSTER",
+        subtitle = "Eat dots, avoid ghouls, collect power!",
         scale = 1,
         scaleDirection = 1,
         scaleSpeed = 0.4,
