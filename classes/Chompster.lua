@@ -38,7 +38,8 @@ function Chompster:update(dt, maze)
         local nextX = self.x + self.nextDirection.x
         local nextY = self.y + self.nextDirection.y
 
-        if maze:getCell(floor(nextX + 0.5), floor(nextY + 0.5)) == 0 then
+        -- Check if the move is valid considering the entity radius
+        if self:isValidMove(maze, nextX, nextY) then
             self.direction.x = self.nextDirection.x
             self.direction.y = self.nextDirection.y
             self.nextDirection.x = 0
@@ -51,7 +52,7 @@ function Chompster:update(dt, maze)
         local nextX = self.x + self.direction.x * self.speed * dt
         local nextY = self.y + self.direction.y * self.speed * dt
 
-        if maze:getCell(floor(nextX + 0.5), floor(nextY + 0.5)) == 0 then
+        if self:isValidMove(maze, nextX, nextY) then
             self.x = nextX
             self.y = nextY
         else
@@ -67,6 +68,34 @@ function Chompster:update(dt, maze)
     elseif self.x > maze.width then
         self.x = 1
     end
+end
+
+function Chompster:isValidMove(maze, x, y)
+    -- Check the center cell
+    local centerCellX, centerCellY = math.floor(x + 0.5), math.floor(y + 0.5)
+    if maze:getCell(centerCellX, centerCellY) ~= 0 then return false end
+
+    -- Check adjacent cells based on movement direction and radius
+    local radius = self.radius
+
+    -- Check cells that the entity's circle might overlap with
+    local checkPositions = {
+        {x - radius, y},          -- left edge
+        {x + radius, y},          -- right edge
+        {x, y - radius},          -- top edge
+        {x, y + radius},          -- bottom edge
+        {x - radius * 0.7, y - radius * 0.7},  -- top-left
+        {x + radius * 0.7, y - radius * 0.7},  -- top-right
+        {x - radius * 0.7, y + radius * 0.7},  -- bottom-left
+        {x + radius * 0.7, y + radius * 0.7}   -- bottom-right
+    }
+
+    for _, pos in ipairs(checkPositions) do
+        local checkX, checkY = math.floor(pos[1] + 0.5), math.floor(pos[2] + 0.5)
+        if maze:getCell(checkX, checkY) ~= 0 then return false end
+    end
+
+    return true
 end
 
 function Chompster:setDirection(dirX, dirY)

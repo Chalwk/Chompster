@@ -92,11 +92,10 @@ function ChaserAI:update(dt, maze, player, otherChasers, difficulty)
         self.direction.y = bestDirection[2]
     end
 
-    -- Move
     local nextX = self.x + self.direction.x * currentSpeed * dt
     local nextY = self.y + self.direction.y * currentSpeed * dt
 
-    if maze:getCell(floor(nextX + 0.5), floor(nextY + 0.5)) == 0 then
+    if self:isValidMove(maze, nextX, nextY) then
         self.x = nextX
         self.y = nextY
     end
@@ -107,6 +106,29 @@ function ChaserAI:update(dt, maze, player, otherChasers, difficulty)
     elseif self.x > maze.width then
         self.x = 1
     end
+end
+
+function ChaserAI:isValidMove(maze, x, y)
+    -- Check the center cell
+    local centerCellX, centerCellY = math.floor(x + 0.5), math.floor(y + 0.5)
+    if maze:getCell(centerCellX, centerCellY) ~= 0 then return false end
+
+    -- Check adjacent cells based on entity radius
+    local radius = self.radius
+
+    local checkPositions = {
+        {x - radius, y},
+        {x + radius, y},
+        {x, y - radius},
+        {x, y + radius}
+    }
+
+    for _, pos in ipairs(checkPositions) do
+        local checkX, checkY = math.floor(pos[1] + 0.5), math.floor(pos[2] + 0.5)
+        if maze:getCell(checkX, checkY) ~= 0 then return false end
+    end
+
+    return true
 end
 
 function ChaserAI:chooseDirection(maze, difficulty, otherChasers)

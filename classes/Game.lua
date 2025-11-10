@@ -4,12 +4,11 @@
 
 local lg = love.graphics
 local random = love.math.random
-local floor, abs, pi, insert = math.floor, math.abs, math.pi, table.insert
+local floor, abs, pi, insert, sqrt = math.floor, math.abs, math.pi, table.insert, math.sqrt
 
 local Game = {}
 Game.__index = Game
 
--- Game constants
 local CELL_SIZE = 40
 local PLAYER_SPEED = 2
 local GHOST_SPEEDS = { easy = 1, medium = 1.5, hard = 2 }
@@ -222,11 +221,17 @@ local function checkCollisions(self)
         end
     end
 
-    -- Check ghost collisions
+    -- Check ghost collisions using distance-based detection
     for _, ghost in ipairs(self.ghosts) do
-        local ghostCellX, ghostCellY = floor(ghost.x + 0.5), floor(ghost.y + 0.5)
+        -- Calculate distance between centers
+        local dx = self.player.x - ghost.x
+        local dy = self.player.y - ghost.y
+        local distance = sqrt(dx * dx + dy * dy)
 
-        if playerCellX == ghostCellX and playerCellY == ghostCellY then
+        -- Collision occurs if distance is less than sum of radii
+        local collisionDistance = 0.3 + 0.3 -- player radius + ghost radius
+
+        if distance < collisionDistance then
             if ghost.scared then
                 -- Eat ghost
                 ghost.x, ghost.y = self.startX, self.startY
