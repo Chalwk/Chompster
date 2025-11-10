@@ -72,7 +72,7 @@ end
 
 function Chompster:isValidMove(maze, x, y)
     -- Check the center cell
-    local centerCellX, centerCellY = math.floor(x + 0.5), math.floor(y + 0.5)
+    local centerCellX, centerCellY = floor(x + 0.5), floor(y + 0.5)
     if maze:getCell(centerCellX, centerCellY) ~= 0 then return false end
 
     -- Check adjacent cells based on movement direction and radius
@@ -91,7 +91,7 @@ function Chompster:isValidMove(maze, x, y)
     }
 
     for _, pos in ipairs(checkPositions) do
-        local checkX, checkY = math.floor(pos[1] + 0.5), math.floor(pos[2] + 0.5)
+        local checkX, checkY = floor(pos[1] + 0.5), floor(pos[2] + 0.5)
         if maze:getCell(checkX, checkY) ~= 0 then return false end
     end
 
